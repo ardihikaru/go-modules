@@ -15,8 +15,8 @@ import (
 	waLog "go.mau.fi/whatsmeow/util/log"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/satumedishub/go-modules/pkg/logger"
-	tgBot "github.com/satumedishub/go-modules/pkg/telegrambot"
+	"github.com/ardihikaru/go-modules/pkg/logger"
+	tgBot "github.com/ardihikaru/go-modules/pkg/telegrambot"
 )
 
 type DataPasser struct {

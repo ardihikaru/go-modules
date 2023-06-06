@@ -7,8 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/satumedishub/go-modules/pkg/logger"
-	"github.com/satumedishub/go-modules/pkg/web"
+	"github.com/ardihikaru/go-modules/pkg/logger"
+	"github.com/ardihikaru/go-modules/pkg/web"
 )
 
 type Messenger struct {
