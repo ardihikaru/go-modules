@@ -6,11 +6,11 @@ import (
 	"time"
 
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/satumedishub/go-modules/pkg/enums/emoji"
 
-	"github.com/satumedishub/go-modules/pkg/enums/loglevel"
-	"github.com/satumedishub/go-modules/pkg/logger"
-	m "github.com/satumedishub/go-modules/pkg/messenger"
+	"github.com/ardihikaru/go-modules/pkg/enums/emoji"
+	"github.com/ardihikaru/go-modules/pkg/enums/loglevel"
+	"github.com/ardihikaru/go-modules/pkg/logger"
+	m "github.com/ardihikaru/go-modules/pkg/messenger"
 )
 
 type TelegramBot struct {

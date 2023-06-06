@@ -146,7 +146,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
       ```
       * for example:
         ```shell
-        git tag -a v0.0.3 -m "add `licence_revoked` field in `identities` storage module"
+        git tag -a v0.0.1 -m "initial repo clone"
         ```
   * add tag to the remote:
       ```
@@ -154,7 +154,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 * Preparing the `go.mod` and `go.sum` ([ref](https://golangbyexample.com/go-mod-sum-module/))
-    * Init: `go mod init github.com/satumedishub/go-modules`
+    * Init: `go mod init github.com/ardihikaru/go-modules`
     * Tidy up: `go mod tidy`
 
 * In case we had created a new tag, but we want to re-install the corresponding package with the latest version. We need to delete the old one from our local repository. Here is the command:
