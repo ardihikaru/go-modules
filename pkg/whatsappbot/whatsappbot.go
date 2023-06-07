@@ -20,7 +20,7 @@ import (
 )
 
 type DataPasser struct {
-	logs chan string
+	Logs chan string
 }
 
 type WhatsappBot struct {
@@ -32,7 +32,7 @@ type WhatsappBot struct {
 
 type LiteWhatsappBot struct {
 	Container *sqlstore.Container
-	log       *logger.Logger
+	Log       *logger.Logger
 }
 
 // Connect builds whatsapp client and connects to it
@@ -76,7 +76,7 @@ func Connect(telegramBot *tgBot.TelegramBot, dbName string, log *logger.Logger) 
 }
 
 // NewContainer builds whatsapp Container
-func NewContainer(telegramBot *tgBot.TelegramBot, dbName string, log *logger.Logger) (*LiteWhatsappBot, error) {
+func NewContainer(dbName string, log *logger.Logger) (*LiteWhatsappBot, error) {
 	address := fmt.Sprintf("file:%s.db?_foreign_keys=on", dbName)
 
 	container, err := sqlstore.New("sqlite3", address, waLog.Noop)
@@ -84,7 +84,7 @@ func NewContainer(telegramBot *tgBot.TelegramBot, dbName string, log *logger.Log
 		return nil, err
 	}
 
-	return &LiteWhatsappBot{Container: container, log: log}, nil
+	return &LiteWhatsappBot{Container: container, Log: log}, nil
 }
 
 // SendMsg sends message to designated whatsapp number
