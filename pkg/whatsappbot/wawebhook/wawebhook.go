@@ -17,6 +17,11 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	IncomingMessage = "INCOMING_MESSAGE"
+	OutgoingMessage = "OUTGOING_MESSAGE"
+)
+
 // WaManager defines the whatsapp container
 type WaManager struct {
 	Container *sqlstore.Container
@@ -27,10 +32,12 @@ type WaManager struct {
 type WaBot struct {
 	Client         *whatsmeow.Client
 	Log            *logger.Logger
+	HttpClient     *http.Client
 	EventHandlerID uint32
 	Phone          string
 	WebhookUrl     string
-	HttpClient     *http.Client
+	EchoMsg        bool
+	WHookEnabled   bool
 }
 
 // NewContainer builds whatsapp Container
@@ -46,7 +53,8 @@ func NewContainer(dbName string, log *logger.Logger) (*WaManager, error) {
 }
 
 // LoginExistingWASession logins with an existing session on the database
-func LoginExistingWASession(httpClient *http.Client, webhookUrl string, container *sqlstore.Container, log *logger.Logger, jidStr, phone string) (*WaBot, error) {
+func LoginExistingWASession(httpClient *http.Client, webhookUrl string, container *sqlstore.Container,
+	log *logger.Logger, jidStr, phone string, echoMsg, wHookEnabled bool) (*WaBot, error) {
 	// build JID
 	jid, _ := types.ParseJID(jidStr)
 
@@ -64,12 +72,12 @@ func LoginExistingWASession(httpClient *http.Client, webhookUrl string, containe
 		return nil, fmt.Errorf("unable connect")
 	}
 
-	return buildWhatsappBot(client, log, phone, httpClient, webhookUrl), nil
+	return buildWhatsappBot(client, log, httpClient, phone, webhookUrl, echoMsg, wHookEnabled), nil
 }
 
 // NewWhatsappClient initializes Whatsapp client
 func NewWhatsappClient(httpClient *http.Client, webhookUrl string, container *sqlstore.Container, log *logger.Logger,
-	phone, fileDir string) (*WaBot, error) {
+	phone, fileDir string, echoMsg, wHookEnabled bool) (*WaBot, error) {
 	var err error
 
 	myDevice := container.NewDevice()
@@ -105,17 +113,19 @@ func NewWhatsappClient(httpClient *http.Client, webhookUrl string, container *sq
 	// ignores error event if happens (e.g. ignore if file does not exists)
 	_ = fh.DeleteFile(filePath)
 
-	return buildWhatsappBot(client, log, phone, httpClient, webhookUrl), nil
+	return buildWhatsappBot(client, log, httpClient, phone, webhookUrl, echoMsg, wHookEnabled), nil
 }
 
-func buildWhatsappBot(client *whatsmeow.Client, log *logger.Logger, phone string, httpClient *http.Client,
-	webhookUrl string) *WaBot {
+func buildWhatsappBot(client *whatsmeow.Client, log *logger.Logger, httpClient *http.Client,
+	phone, webhookUrl string, echoMsg, wHookEnabled bool) *WaBot {
 	return &WaBot{
-		Client:     client,
-		Log:        log,
-		Phone:      phone,
-		HttpClient: httpClient,
-		WebhookUrl: webhookUrl,
+		Client:       client,
+		Log:          log,
+		Phone:        phone,
+		HttpClient:   httpClient,
+		WebhookUrl:   webhookUrl,
+		EchoMsg:      echoMsg,
+		WHookEnabled: wHookEnabled,
 	}
 }
 
@@ -128,11 +138,25 @@ func (wb *WaBot) Register() {
 func (wb *WaBot) eventHandler(evt interface{}) {
 	switch v := evt.(type) {
 	case *events.Message:
+		// when DeviceSentMeta is nil -> Incoming message (this device is receiving a message)
+		// when DeviceSentMeta is NOT nil -> Outgoing message (this device is sending a message)
+		var deviceTargetJID types.JID
+		if v.Info.DeviceSentMeta != nil {
+			deviceTargetJIDStr := v.Info.DeviceSentMeta.DestinationJID
+			deviceTargetJID, _ = types.ParseJID(deviceTargetJIDStr)
+		}
+
 		msgId := v.Info.ID
+		msgType := v.Info.Type // e.g. Text
 		phone := v.Info.Sender.User
 		name := v.Info.PushName
 		ts := v.Info.Timestamp
 		message := v.Message.GetConversation()
+
+		// do nothing if webhook disabled
+		if !wb.WHookEnabled {
+			return
+		}
 
 		// monkey patch! sometimes the text is not in the Conversation, but in the ExtendedTextMessage
 		// e.g. from Albert / Taiwan
@@ -140,11 +164,31 @@ func (wb *WaBot) eventHandler(evt interface{}) {
 			message = *v.Message.ExtendedTextMessage.Text
 		}
 
-		if message != "" {
-			wb.Log.Info(fmt.Sprintf("**** [%s][%s] Received a message from [%s] (%s)! -> '%s'",
-				ts, msgId, name, phone, message))
+		if message != "" && v.Info.DeviceSentMeta == nil {
+			wb.Log.Info(fmt.Sprintf("**** [%s][%s] Received a [%s] message from [%s] (%s) -> '%s'",
+				ts, msgId, msgType, name, phone, message))
 
 			// on receiving message, send the message to the designated webhook
+			resp, err := wb.sendToWebhook(&deviceTargetJID, IncomingMessage, msgId, msgType, phone, name, message, ts)
+			if err != nil {
+				wb.Log.Error("failed to forward incoming message to webhook", zap.Error(err))
+			} else {
+				wb.replyMessage(&deviceTargetJID, phone, resp)
+			}
+		} else if message != "" && v.Info.DeviceSentMeta != nil {
+			//} else if message != "" && phone == wb.Phone {
+			wb.Log.Debug(fmt.Sprintf("**** [%s][%s] Sent a [%s] message to [%s] (%s) -> '%s'",
+				ts, msgId, msgType, name, deviceTargetJID.User, message))
+
+			// TODO: it sends a message to itself, any special action to do?
+			if phone == wb.Phone {
+			}
+
+			// TODO: on sent message, do something here
+			//_, err := wb.sendToWebhook(nil, OutgoingMessage, msgId, msgType, phone, name, message, ts)
+			//if err != nil {
+			//	wb.Log.Error("failed to forward outgoing message to webhook", zap.Error(err))
+			//}
 		}
 	}
 }
