@@ -26,6 +26,12 @@ const (
 	// RequestJSONExtractionFailed is an application error code where system is unable to unmarshal captured JSON data
 	RequestJSONExtractionFailed = 1003
 
+	// InvalidOrderQuery is an application error code where the order is invalid
+	InvalidOrderQuery = 1004
+
+	// InvalidSortQuery is an application error code where the sort is invalid
+	InvalidSortQuery = 1005
+
 	// InputValidationError is an application error code where the captured input data got validation error
 	InputValidationError = 2001
 
@@ -50,6 +56,8 @@ var responseText = map[int]string{
 	RenderFailed:                "failed to render a valid response body",
 	InvalidRequestJSON:          "failed to extract request body",
 	RequestJSONExtractionFailed: "failed to read JSON body from the request",
+	InvalidOrderQuery:           "invalid order in URL parameters",
+	InvalidSortQuery:            "invalid sort in URL parameters",
 
 	InputValidationError: "got input validation error",
 	UnauthorizedAccess:   "identity is unauthorized to access this API",
@@ -73,8 +81,11 @@ func ResponseText(identifier string, code int) string {
 
 // Response renderer type for handling all sorts of http response
 type Response struct {
+	Err            error       `json:"-"`
 	HTTPStatusCode int         `json:"-"`                                                                            // response response status code
 	Data           interface{} `json:"data,omitempty"`                                                               // always set as empty
+	Total          int64       `json:"total"`                                                                        // total fetched records
+	Success        bool        `json:"success,omitempty"`                                                            // always set as empty
 	MessageText    string      `json:"message,omitempty" example:"Resource not found."`                              // user-level status message
 	AppErrCode     int64       `json:"code,omitempty" example:"404"`                                                 // application-specific error code
 	ErrorText      string      `json:"error,omitempty" example:"The requested resource was not found on the server"` // application-level error message, for debugging
