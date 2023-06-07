@@ -30,6 +30,11 @@ type WhatsappBot struct {
 	eventHandlerID uint32
 }
 
+type LiteWhatsappBot struct {
+	Container *sqlstore.Container
+	log       *logger.Logger
+}
+
 // Connect builds whatsapp client and connects to it
 func Connect(telegramBot *tgBot.TelegramBot, dbName string, log *logger.Logger) (*WhatsappBot, error) {
 	address := fmt.Sprintf("file:%s.db?_foreign_keys=on", dbName)
@@ -68,6 +73,18 @@ func Connect(telegramBot *tgBot.TelegramBot, dbName string, log *logger.Logger) 
 		log.Info("whatsapp account has been connected successfully")
 	}
 	return &WhatsappBot{TelegramBot: telegramBot, Client: client, log: log}, nil
+}
+
+// NewContainer builds whatsapp Container
+func NewContainer(telegramBot *tgBot.TelegramBot, dbName string, log *logger.Logger) (*LiteWhatsappBot, error) {
+	address := fmt.Sprintf("file:%s.db?_foreign_keys=on", dbName)
+
+	container, err := sqlstore.New("sqlite3", address, waLog.Noop)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LiteWhatsappBot{Container: container, log: log}, nil
 }
 
 // SendMsg sends message to designated whatsapp number
