@@ -40,6 +40,9 @@ type WaBot struct {
 	WHookEnabled   bool
 }
 
+// BotClientList defines the variable to store WaBot objects
+type BotClientList map[string]*WaBot
+
 // NewContainer builds whatsapp Container
 func NewContainer(dbName string, log *logger.Logger) (*WaManager, error) {
 	address := fmt.Sprintf("file:%s.db?_foreign_keys=on", dbName)
