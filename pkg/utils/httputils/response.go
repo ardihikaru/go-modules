@@ -38,8 +38,14 @@ const (
 	// UnauthorizedAccess is an application error code where the identity has no authorize to access
 	UnauthorizedAccess = 2002
 
+	// LoginFailed is an application error code where user failed to log in
+	LoginFailed = 2003
+
 	// BadRequest is an application error to represent bad request
 	BadRequest = 3001
+
+	// FailedToFetchData is an application error code where user failed to fetch data from the database
+	FailedToFetchData = 3002
 
 	// CreateDataFailed is an application error to represent that create process failed
 	CreateDataFailed = 4001
@@ -61,8 +67,10 @@ var responseText = map[int]string{
 
 	InputValidationError: "got input validation error",
 	UnauthorizedAccess:   "identity is unauthorized to access this API",
+	LoginFailed:          "invalid login data",
 
-	BadRequest: "bad request",
+	BadRequest:        "bad request",
+	FailedToFetchData: "failed to fetch data from the database",
 
 	CreateDataFailed: "insert process failed",
 	UpdateDataFailed: "update process failed",
@@ -117,6 +125,7 @@ func httpOKPayload(respBody Response) render.Renderer {
 		HTTPStatusCode: http.StatusOK,
 		Data:           respBody.Data,
 		MessageText:    respBody.MessageText,
+		Total:          respBody.Total,
 	}
 }
 
