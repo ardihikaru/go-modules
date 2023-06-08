@@ -15,6 +15,7 @@ import (
 )
 
 type WebhookBody struct {
+	PhoneOwner   string `json:"phone_owner"`
 	EventType    string `json:"event_type"`
 	MsgId        string `json:"msg_id"`
 	MsgType      string `json:"msg_type"`
@@ -27,7 +28,7 @@ type WebhookBody struct {
 }
 
 // sendToWebhook sends the captured message to webhook
-func (wb *WaBot) sendToWebhook(targetJID *types.JID, evtType, msgId, msgType, phone, name, message string,
+func (wb *WaBot) sendToWebhook(targetJID *types.JID, evtType, msgId, msgType, phone, name, message, phoneOwner string,
 	ts time.Time) (*httputils.Response, error) {
 	// if echo message enabled, simply send and echo message
 	if wb.EchoMsg {
@@ -40,6 +41,7 @@ func (wb *WaBot) sendToWebhook(targetJID *types.JID, evtType, msgId, msgType, ph
 		// otherwise, send POST request to the designated webhook
 		// prepare body
 		bodyObj := &WebhookBody{
+			PhoneOwner:   phoneOwner,
 			EventType:    evtType,
 			MsgId:        msgId,
 			MsgType:      msgType,
