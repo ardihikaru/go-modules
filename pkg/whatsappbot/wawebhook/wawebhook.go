@@ -172,7 +172,8 @@ func (wb *WaBot) eventHandler(evt interface{}) {
 				ts, msgId, msgType, name, phone, message))
 
 			// on receiving message, send the message to the designated webhook
-			resp, err := wb.sendToWebhook(&deviceTargetJID, IncomingMessage, msgId, msgType, phone, name, message, ts)
+			resp, err := wb.sendToWebhook(&deviceTargetJID, IncomingMessage, msgId, msgType, phone, name, message,
+				wb.Phone, ts)
 			if err != nil {
 				wb.Log.Error("failed to forward incoming message to webhook", zap.Error(err))
 			} else {
