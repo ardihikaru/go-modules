@@ -30,8 +30,8 @@ func (wb *WaBot) replyMessage(targetJID *types.JID, phone string, resp *httputil
 			phone = fmt.Sprintf("+%s", phone)
 		}
 
-		// validates phone number
-		recipient, err := wb.validateAndGetRecipient(phone, true)
+		// validates phone number and get the recipient
+		recipient, err := wb.ValidateAndGetRecipient(phone, true)
 		if err != nil {
 			wb.Log.Error(fmt.Sprintf("phone [%s] got validation error(s)", phone), zap.Error(err))
 			return
@@ -49,8 +49,8 @@ func (wb *WaBot) replyMessage(targetJID *types.JID, phone string, resp *httputil
 	}
 }
 
-// validate validates the phone number
-func (wb *WaBot) validateAndGetRecipient(phone string, ignoreInContactList bool) (*types.JID, error) {
+// ValidateAndGetRecipient validates the phone number
+func (wb *WaBot) ValidateAndGetRecipient(phone string, ignoreInContactList bool) (*types.JID, error) {
 	var err error
 	phones := make([]string, 1)
 
