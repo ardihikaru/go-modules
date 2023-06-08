@@ -54,6 +54,11 @@ func (wb *WaBot) ValidateAndGetRecipient(phone string, ignoreInContactList bool)
 	var err error
 	phones := make([]string, 1)
 
+	// enriches with `+` symbol if missing
+	if phone[0:1] != "+" {
+		phone = fmt.Sprintf("+%s", phone)
+	}
+
 	phones[0] = phone
 
 	// checks if this number available on Whatsapp or not
