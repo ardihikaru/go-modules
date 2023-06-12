@@ -2,7 +2,9 @@
 package httputils
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -139,4 +141,9 @@ func RenderErrResponse(w http.ResponseWriter, r *http.Request, errText string, a
 // rendering may fails and returns an error, otherwise it returns nil value
 func RenderOKResponse(w http.ResponseWriter, r *http.Request, respBody Response) error {
 	return render.Render(w, r, httpOKPayload(respBody))
+}
+
+// ToJson converts response object into target object
+func ToJson(body io.Reader, targetStruct interface{}) error {
+	return json.NewDecoder(body).Decode(targetStruct)
 }
