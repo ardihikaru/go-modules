@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/ardihikaru/go-modules/pkg/logger"
 	fh "github.com/ardihikaru/go-modules/pkg/utils/filehandler"
 	qrCodeH "github.com/ardihikaru/go-modules/pkg/utils/qrcodehandler"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/mdp/qrterminal"
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	"go.mau.fi/whatsmeow/types"
@@ -80,7 +82,7 @@ func LoginExistingWASession(httpClient *http.Client, webhookUrl string, containe
 
 // NewWhatsappClient initializes Whatsapp client
 func NewWhatsappClient(httpClient *http.Client, webhookUrl string, container *sqlstore.Container, log *logger.Logger,
-	phone, fileDir string, echoMsg, wHookEnabled bool) (*WaBot, error) {
+	phone, fileDir string, echoMsg, wHookEnabled bool, printTerminal bool) (*WaBot, error) {
 	var err error
 
 	myDevice := container.NewDevice()
@@ -106,6 +108,11 @@ func NewWhatsappClient(httpClient *http.Client, webhookUrl string, container *sq
 			if err != nil {
 				log.Error("failed to write QR Code to file", zap.Error(err))
 				return nil, err
+			}
+
+			// prints qrcode in terminal (if enabled)
+			if printTerminal {
+				qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
 			}
 		} else {
 			log.Info(fmt.Sprintf("Login event: %s", evt.Event))
