@@ -116,6 +116,9 @@ func NewWhatsappClient(httpClient *http.Client, webhookUrl string, container *sq
 			}
 		} else {
 			log.Info(fmt.Sprintf("Login event: %s", evt.Event))
+
+			// since there is no valid open client, cancel the request
+			// return nil, fmt.Errorf("failed to open a new session")
 		}
 	}
 
