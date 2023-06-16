@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -19,6 +20,35 @@ func ToDateString(date time.Time) string {
 	}
 
 	return fmt.Sprintf("%v-%s-%s", year, monthStr, dayStr)
+}
+
+func ToDateId(dateStr string) string {
+	rMonth := strings.NewReplacer(
+		"January", "Januari",
+		"February", "Februari",
+		"March", "maret",
+		"April", "April",
+		"May", "Mei",
+		"June", "Juni",
+		"July", "Juli",
+		"August", "Agustus",
+		"September", "September",
+		"October", "Oktober",
+		"November", "November",
+		"December", "Desember",
+	)
+
+	rDay := strings.NewReplacer(
+		"Monday", "Senin",
+		"Tuesday", "Selasa",
+		"Wednesday", "Rabu",
+		"Thursday", "Kamis",
+		"Friday", "Jumat",
+		"Saturday", "Sabtu",
+		"Sunday", "Minggu",
+	)
+
+	return rDay.Replace(rMonth.Replace(dateStr))
 }
 
 func ToTimeString(date time.Time) string {
