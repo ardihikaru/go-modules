@@ -5,13 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"time"
 
-	"github.com/ardihikaru/go-modules/pkg/utils/httpclient"
-	"github.com/ardihikaru/go-modules/pkg/utils/httputils"
+	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/ardihikaru/go-modules/pkg/utils/httpclient"
+	"github.com/ardihikaru/go-modules/pkg/utils/httputils"
 )
 
 type WebhookBody struct {
@@ -107,4 +110,47 @@ func (wb *WaBot) SendMsg(recipient types.JID, msg string) error {
 	}
 
 	return nil
+}
+
+// SendImgMsg sends image-based message to designated whatsapp number
+func (wb *WaBot) SendImgMsg(recipient types.JID, uploadedImg *whatsmeow.UploadResponse, imgCaption, contentType string,
+	fileLength uint64) error {
+	msg := &waProto.Message{ImageMessage: &waProto.ImageMessage{
+		Caption:       proto.String(imgCaption),
+		Url:           proto.String(uploadedImg.URL),
+		DirectPath:    proto.String(uploadedImg.DirectPath),
+		MediaKey:      uploadedImg.MediaKey,
+		Mimetype:      proto.String(contentType),
+		FileEncSha256: uploadedImg.FileEncSHA256,
+		FileSha256:    uploadedImg.FileSHA256,
+		FileLength:    proto.Uint64(fileLength),
+	}}
+
+	resp, err := wb.Client.SendMessage(context.Background(), recipient, msg)
+	if err != nil {
+		wb.Log.Debug(fmt.Sprintf("[to:%s] failed to send image message: %s", recipient.User, msg))
+		return err
+	} else {
+		wb.Log.Debug(fmt.Sprintf("[to:%s] message sent (server timestamp: %s)", recipient.User, resp.Timestamp))
+	}
+
+	return nil
+}
+
+// UploadImgToWhatsapp uploads the prepared image to Whatsapp server
+func (wb *WaBot) UploadImgToWhatsapp(imgPath string) (*[]byte, *whatsmeow.UploadResponse, error) {
+	// first, prepares the image file as bytes
+	imgInBytes, err := os.ReadFile(imgPath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// then, uploads to whatsapp server
+	uploaded, err := wb.Client.Upload(context.Background(), imgInBytes, whatsmeow.MediaImage)
+	if err != nil {
+		wb.Log.Debug(fmt.Sprintf("[to:%s] failed to upload file"))
+		return nil, nil, err
+	}
+
+	return &imgInBytes, &uploaded, nil
 }

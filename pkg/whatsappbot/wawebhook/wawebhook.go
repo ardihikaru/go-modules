@@ -38,6 +38,7 @@ type WaBot struct {
 	EventHandlerID uint32
 	Phone          string
 	WebhookUrl     string
+	ImageDir       string
 	EchoMsg        bool
 	WHookEnabled   bool
 }
@@ -58,7 +59,7 @@ func NewContainer(dbName string, log *logger.Logger) (*WaManager, error) {
 }
 
 // LoginExistingWASession logins with an existing session on the database
-func LoginExistingWASession(httpClient *http.Client, webhookUrl string, container *sqlstore.Container,
+func LoginExistingWASession(httpClient *http.Client, webhookUrl, imageDir string, container *sqlstore.Container,
 	log *logger.Logger, jidStr, phone string, echoMsg, wHookEnabled bool) (*WaBot, error) {
 	// build JID
 	jid, _ := types.ParseJID(jidStr)
@@ -77,11 +78,11 @@ func LoginExistingWASession(httpClient *http.Client, webhookUrl string, containe
 		return nil, fmt.Errorf("unable connect")
 	}
 
-	return buildWhatsappBot(client, log, httpClient, phone, webhookUrl, echoMsg, wHookEnabled), nil
+	return buildWhatsappBot(client, log, httpClient, phone, webhookUrl, imageDir, echoMsg, wHookEnabled), nil
 }
 
 // NewWhatsappClient initializes Whatsapp client
-func NewWhatsappClient(httpClient *http.Client, webhookUrl string, container *sqlstore.Container, log *logger.Logger,
+func NewWhatsappClient(httpClient *http.Client, webhookUrl, imageDir string, container *sqlstore.Container, log *logger.Logger,
 	phone, fileDir string, echoMsg, wHookEnabled bool, printTerminal bool) (*WaBot, error) {
 	var err error
 
@@ -126,17 +127,18 @@ func NewWhatsappClient(httpClient *http.Client, webhookUrl string, container *sq
 	// ignores error event if happens (e.g. ignore if file does not exists)
 	_ = fh.DeleteFile(filePath)
 
-	return buildWhatsappBot(client, log, httpClient, phone, webhookUrl, echoMsg, wHookEnabled), nil
+	return buildWhatsappBot(client, log, httpClient, phone, webhookUrl, imageDir, echoMsg, wHookEnabled), nil
 }
 
 func buildWhatsappBot(client *whatsmeow.Client, log *logger.Logger, httpClient *http.Client,
-	phone, webhookUrl string, echoMsg, wHookEnabled bool) *WaBot {
+	phone, webhookUrl, imageDir string, echoMsg, wHookEnabled bool) *WaBot {
 	return &WaBot{
 		Client:       client,
 		Log:          log,
 		Phone:        phone,
 		HttpClient:   httpClient,
 		WebhookUrl:   webhookUrl,
+		ImageDir:     imageDir,
 		EchoMsg:      echoMsg,
 		WHookEnabled: wHookEnabled,
 	}
