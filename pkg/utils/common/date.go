@@ -67,3 +67,18 @@ func ToTimeString(date time.Time) string {
 
 	return fmt.Sprintf("%s:%s %s", hourStr, minuteStr, clockHour)
 }
+
+func ToTimeStringWithTz(date time.Time, tz string) string {
+	hour, minute := date.Hour(), date.Minute()
+
+	hourStr := strconv.Itoa(hour)
+	minuteStr := strconv.Itoa(minute)
+	if hour < 10 {
+		hourStr = fmt.Sprintf("0%s", hourStr)
+	}
+	if minute < 10 {
+		minuteStr = fmt.Sprintf("0%s", minuteStr)
+	}
+
+	return fmt.Sprintf("%s:%s %s", hourStr, minuteStr, tz)
+}
