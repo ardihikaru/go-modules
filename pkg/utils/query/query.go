@@ -1,5 +1,7 @@
 package query
 
+import "encoding/json"
+
 // FilterListParams defines the captured filter query parameters
 type FilterListParams struct {
 	Ids []string `json:"id"`
@@ -7,7 +9,8 @@ type FilterListParams struct {
 
 // FilterQueryParams defines the captured filter query parameters
 type FilterQueryParams struct {
-	Keyword string `json:"q"`
+	Keyword string             `json:"q"`
+	Filter  *map[string]string `json:"filter"`
 }
 
 // maps valid query order
@@ -22,4 +25,20 @@ func GetOrderMap() map[string]bool {
 		ASC:  true,
 		DESC: true,
 	}
+}
+
+// GetFilterQuery extracts filter from the url query
+func GetFilterQuery(filter string, destType interface{}) error {
+	// in some cases, it will ignore it
+	if filter == "{}" {
+		return nil
+	}
+
+	// extracts to designated variable
+	err := json.Unmarshal([]byte(filter), destType)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

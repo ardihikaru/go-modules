@@ -18,5 +18,5 @@ type GetQueryParams struct {
 	Search string `json:"search,omitempty"`
 
 	// filter target by field
-	Filter string `json:"filter,omitempty"`
+	Filter map[string]string `json:"filter,omitempty"`
 }
