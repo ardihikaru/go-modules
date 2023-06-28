@@ -68,3 +68,13 @@ func (r *Redis) Get(key string, destType interface{}) error {
 
 	return json.Unmarshal([]byte(val), &destType)
 }
+
+// GetStr gets value (as a string) from redis database
+func (r *Redis) GetStr(key string) (*string, error) {
+	val, err := r.Client.Get(key).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	return &val, nil
+}
