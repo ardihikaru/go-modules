@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/ardihikaru/go-modules/pkg/utils/web"
 	"io"
 	"net/http"
 
 	"github.com/ardihikaru/go-modules/pkg/logger"
-	"github.com/ardihikaru/go-modules/pkg/web"
 )
 
 type Messenger struct {
