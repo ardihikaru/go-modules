@@ -6,9 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ardihikaru/go-modules/pkg/logger"
-	fh "github.com/ardihikaru/go-modules/pkg/utils/filehandler"
-	qrCodeH "github.com/ardihikaru/go-modules/pkg/utils/qrcodehandler"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/mdp/qrterminal"
 	"go.mau.fi/whatsmeow"
@@ -17,6 +14,10 @@ import (
 	"go.mau.fi/whatsmeow/types/events"
 	waLog "go.mau.fi/whatsmeow/util/log"
 	"go.uber.org/zap"
+
+	"github.com/ardihikaru/go-modules/pkg/logger"
+	fh "github.com/ardihikaru/go-modules/pkg/utils/filehandler"
+	qrCodeH "github.com/ardihikaru/go-modules/pkg/utils/qrcodehandler"
 )
 
 const (

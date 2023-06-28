@@ -1,4 +1,4 @@
-package httpclient
+package web
 
 import (
 	"bytes"
@@ -48,38 +48,38 @@ func BuildRequest(apiUrl, method string, body io.Reader) (*http.Request, error) 
 }
 
 // ExecRequest executes request
-func ExecRequest(httpClient *http.Client, req *http.Request) (interface{}, error) {
+func ExecRequest(httpClient *http.Client, req *http.Request) (interface{}, *int, error) {
 	// sends request
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
 	// checks status code, if not 200, returns the error message from the RESTApi
 	// otherwise, it means that the JSON data extraction was failed
 	if resp.StatusCode == 204 {
-		return nil, fmt.Errorf("no content found")
+		return nil, &resp.StatusCode, fmt.Errorf("no content found")
 	}
 	if resp.StatusCode == 404 {
-		return nil, fmt.Errorf("designated API not found")
+		return nil, &resp.StatusCode, fmt.Errorf("designated API not found")
 	}
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("failed to fetch data from the designated URL")
+		return nil, &resp.StatusCode, fmt.Errorf("failed to fetch data from the designated service")
 	}
 
 	// read response body
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf(httputils.ResponseText("", httputils.InvalidRequestJSON)), err
+		return fmt.Errorf(httputils.ResponseText("", httputils.InvalidRequestJSON)), nil, err
 	}
 
-	// Convert response body to clinicSingleRespPayload struct
+	// Convert response body to designated struct (respPayload)
 	var respPayload interface{}
 	err = json.Unmarshal(bodyBytes, &respPayload)
 	if err != nil {
-		return nil, fmt.Errorf(httputils.ResponseText("", httputils.RequestJSONExtractionFailed))
+		return nil, nil, fmt.Errorf(httputils.ResponseText("", httputils.RequestJSONExtractionFailed))
 	}
 
-	return respPayload, nil
+	return respPayload, &resp.StatusCode, nil
 }

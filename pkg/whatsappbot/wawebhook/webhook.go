@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ardihikaru/go-modules/pkg/utils/web"
 	"io"
 	"os"
 	"time"
@@ -13,7 +14,6 @@ import (
 	"go.mau.fi/whatsmeow/types"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/ardihikaru/go-modules/pkg/utils/httpclient"
 	"github.com/ardihikaru/go-modules/pkg/utils/httputils"
 )
 
@@ -57,10 +57,10 @@ func (wb *WaBot) sendToWebhook(targetJID *types.JID, evtType, msgId, msgType, ph
 		}
 
 		// builds body
-		body, err := httpclient.BuildFormBody(bodyObj)
+		body, err := web.BuildFormBody(bodyObj)
 
 		// builds request
-		req, err := httpclient.BuildRequest(wb.WebhookUrl, "POST", body)
+		req, err := web.BuildRequest(wb.WebhookUrl, "POST", body)
 		if err != nil {
 			return nil, err
 		}

@@ -7,4 +7,10 @@ const (
 	HeaderContentTypeKey    = "Content-Type"
 	HeaderContentTypeValue  = "application/json"
 	HeaderBearerTokenPrefix = "bearer"
+
+	HttpPost    = "POST"
+	HttpPut     = "PUT"
+	HttpDelete  = "DELETE"
+	HttpGet     = "GET"
+	HttpOptions = "OPTIONS"
 )
