@@ -174,6 +174,12 @@ func (wb *WaBot) eventHandler(evt interface{}) {
 			return
 		}
 
+		// do nothing if webhook URL is empty
+		if wb.WebhookUrl == "" {
+			wb.Log.Warn("invalid Webhook URL due to an empty value")
+			return
+		}
+
 		// monkey patch! sometimes the text is not in the Conversation, but in the ExtendedTextMessage
 		// e.g. from Albert / Taiwan
 		if message == "" && v.Message.ExtendedTextMessage != nil {
