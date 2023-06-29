@@ -197,7 +197,7 @@ func (wb *WaBot) eventHandler(evt interface{}) {
 		}
 
 		if message != "" && v.Info.DeviceSentMeta == nil {
-			wb.Log.Info(fmt.Sprintf("**** [%s][%s] Received a [%s] message from [%s] (%s) -> '%s'",
+			wb.Log.Debug(fmt.Sprintf("**** [%s][%s] Received a [%s] message from [%s] (%s) -> '%s'",
 				ts, msgId, msgType, name, phone, message))
 
 			// on receiving message, send the message to the designated webhook
