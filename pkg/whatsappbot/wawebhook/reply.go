@@ -18,14 +18,14 @@ type ReplyMessage struct {
 }
 
 // replyMessage replies the captured message and do reply
-func (wb *WaBot) replyMessage(targetJID *types.JID, phone string, resp *httputils.Response) {
+func (wb *WaBot) replyMessage(targetJID *types.JID, phone string, resp *httputils.Response) error {
 	// extracts response payload
 	byteData, _ := json.Marshal(resp.Data)
 	replyMsgObj := ReplyMessage{}
 	err := json.Unmarshal(byteData, &replyMsgObj)
 	if err != nil {
 		wb.Log.Error("failed to convert reply payload response", zap.Error(err))
-		return
+		return err
 	}
 
 	if targetJID.User == "" {
@@ -38,19 +38,21 @@ func (wb *WaBot) replyMessage(targetJID *types.JID, phone string, resp *httputil
 		recipient, err := wb.ValidateAndGetRecipient(phone, true)
 		if err != nil {
 			wb.Log.Error(fmt.Sprintf("phone [%s] got validation error(s)", phone), zap.Error(err))
-			return
+			return err
 		}
 
 		// sends a reply message
 		err = wb.sendMsgAndWait(*recipient, replyMsgObj)
 		if err != nil {
 			wb.Log.Error("failed to reply the captured message", zap.Error(err))
-			return
+			return err
 		}
 
 	} else {
 		// TODO: process outgoing message
 	}
+
+	return nil
 }
 
 // ValidateAndGetRecipient validates the phone number

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/mdp/qrterminal"
@@ -162,6 +163,9 @@ func (wb *WaBot) eventHandler(evt interface{}) {
 			deviceTargetJID, _ = types.ParseJID(deviceTargetJIDStr)
 		}
 
+		isGroup := v.Info.MessageSource.IsGroup
+		chatJID := v.Info.Chat
+		senderJID := v.Info.Sender
 		msgId := v.Info.ID
 		msgType := v.Info.Type // e.g. Text
 		phone := v.Info.Sender.User
@@ -171,6 +175,12 @@ func (wb *WaBot) eventHandler(evt interface{}) {
 
 		// do nothing if webhook disabled
 		if !wb.WHookEnabled {
+			return
+		}
+
+		// do nothing if chat comes from any group
+		if isGroup {
+			wb.Log.Debug("ignores a chat comes from a group")
 			return
 		}
 
@@ -196,10 +206,15 @@ func (wb *WaBot) eventHandler(evt interface{}) {
 			if err != nil {
 				wb.Log.Error("failed to forward incoming message to webhook", zap.Error(err))
 			} else {
-				wb.replyMessage(&deviceTargetJID, phone, resp)
+				// sends the reply message
+				err = wb.replyMessage(&deviceTargetJID, phone, resp)
+
+				// on success, mark as read
+				if err == nil {
+					wb.markAsReadMessage(msgId, chatJID, senderJID)
+				}
 			}
 		} else if message != "" && v.Info.DeviceSentMeta != nil {
-			//} else if message != "" && phone == wb.Phone {
 			wb.Log.Debug(fmt.Sprintf("**** [%s][%s] Sent a [%s] message to [%s] (%s) -> '%s'",
 				ts, msgId, msgType, name, deviceTargetJID.User, message))
 
@@ -213,5 +228,16 @@ func (wb *WaBot) eventHandler(evt interface{}) {
 			//	wb.Log.Error("failed to forward outgoing message to webhook", zap.Error(err))
 			//}
 		}
+	}
+}
+
+func (wb *WaBot) markAsReadMessage(msgId string, chat, sender types.JID) {
+	// builds list of target JID
+	var ids []types.MessageID
+	ids = append(ids, msgId)
+
+	err := wb.Client.MarkRead(ids, time.Now().UTC(), chat, sender)
+	if err != nil {
+		wb.Log.Warn("failed to mark message as read")
 	}
 }
