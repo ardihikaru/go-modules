@@ -95,6 +95,10 @@ func NewWhatsappClient(httpClient *http.Client, webhookUrl, imageDir string, con
 	client := whatsmeow.NewClient(myDevice, clientLog)
 
 	// generates file path to store the qr code
+	// makes sure that phone contains + symbol
+	if phone[0:1] != "+" {
+		phone = fmt.Sprintf("+%s", phone)
+	}
 	filePath := fmt.Sprintf("%s/%s.png", fileDir, phone)
 
 	// No ID stored, new login
