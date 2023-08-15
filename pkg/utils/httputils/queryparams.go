@@ -19,4 +19,7 @@ type GetQueryParams struct {
 
 	// filter target by field
 	Filter map[string]string `json:"filter,omitempty"`
+
+	// filter target by List
+	FilterList map[string][]string `json:"filter_list,omitempty"`
 }
