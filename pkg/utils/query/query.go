@@ -9,8 +9,9 @@ type FilterListParams struct {
 
 // FilterQueryParams defines the captured filter query parameters
 type FilterQueryParams struct {
-	Keyword string             `json:"q"`
-	Filter  *map[string]string `json:"filter"`
+	Keyword    string               `json:"q"`
+	Filter     *map[string]string   `json:"filter"`
+	FilterList *map[string][]string `json:"filter_list"`
 }
 
 // maps valid query order
