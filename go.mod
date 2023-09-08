@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/render v1.0.2
 	github.com/go-redis/redis v6.15.9+incompatible
-	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
+	github.com/matterbridge/telegram-bot-api/v6 v6.5.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/mdp/qrterminal v1.0.1
 	github.com/yougg/go-qrcode v0.0.0-20181009131600-c335135af91e

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	tgBotApi "github.com/matterbridge/telegram-bot-api/v6"
 
 	"github.com/ardihikaru/go-modules/pkg/enums/emoji"
 	"github.com/ardihikaru/go-modules/pkg/enums/loglevel"

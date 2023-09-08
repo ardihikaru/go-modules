@@ -163,4 +163,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     ```
     * where `v0.0.2` is the version we want to remove
 
+* [How to add bot to telegram group](https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id)
+
 <p> Copyright &copy; 2022 Private use in within the SatuMedis Development Team. All Rights Reserved.</p>
