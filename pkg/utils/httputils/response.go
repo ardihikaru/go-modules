@@ -49,6 +49,15 @@ const (
 	// FailedToFetchData is an application error code where user failed to fetch data from the database
 	FailedToFetchData = 3002
 
+	// InvalidLimitValue is an application error to represent bad request due to wrong limit value
+	InvalidLimitValue = 3003
+
+	// InvalidOffsetValue is an application error to represent bad request due to wrong offset value
+	InvalidOffsetValue = 3004
+
+	// InvalidURLParameters is an application error to represent bad request due to invalid URL parameter values
+	InvalidURLParameters = 3005
+
 	// CreateDataFailed is an application error to represent that create process failed
 	CreateDataFailed = 4001
 
@@ -71,8 +80,11 @@ var responseText = map[int]string{
 	UnauthorizedAccess:   "identity is unauthorized to access this API",
 	LoginFailed:          "invalid login data",
 
-	BadRequest:        "bad request",
-	FailedToFetchData: "failed to fetch data from the database",
+	BadRequest:           "bad request",
+	FailedToFetchData:    "failed to fetch data from the database",
+	InvalidLimitValue:    "invalid limit value",
+	InvalidOffsetValue:   "invalid offset value",
+	InvalidURLParameters: "failed to extract URL parameters",
 
 	CreateDataFailed: "insert process failed",
 	UpdateDataFailed: "update process failed",
